@@ -879,9 +879,11 @@ class MainForm(QMainWindow, MainWindow):
         return search_for
 
     def pushButton_NextScan_clicked(self):
+        print("Next scan clicked")
         global ProgressRun
         line_edit_text = self.lineEdit_Scan.text()
         search_for = self.validate_search(line_edit_text)
+        print("Progress thread attempting start... await confirmation")
         #ProgressBar
         global threadpool; threadpool.start(Worker(self.update_progress_bar))
         # TODO add some validation for the search command
@@ -1089,6 +1091,7 @@ class MainForm(QMainWindow, MainWindow):
 #Async Functions
 
     def update_progress_bar(self):
+        print("Progress bar thread successfully started")
         global ProgressRun
         global Exiting
         self.progressBar.setValue(0)
@@ -1097,6 +1100,7 @@ class MainForm(QMainWindow, MainWindow):
             sleep(0.1)
             value = int(round(self.backend.get_scan_progress() * 100))
             self.progressBar.setValue(value)
+        print("Progress bar thread exiting")
 
     def update_address_table_loop(self):
         while(Exiting == 0):
@@ -1108,10 +1112,12 @@ class MainForm(QMainWindow, MainWindow):
                     print("Update Table failed :(")
 
     def freeze(self):
+        print("Freeze thread succesfully started")
         while(FreezeStop == 0 and Exiting == 0):
             sleep(FreezeInterval/1000)
             for x in FreezeVars:
                 GDB_Engine.write_memory(x, FreezeVars[x][0], FreezeVars[x][1])
+        print("Freeze thread exiting")
 #----------------------------------------------------
 
     def treeWidget_AddressTable_item_clicked(self, row, column):
@@ -1119,6 +1125,7 @@ class MainForm(QMainWindow, MainWindow):
         global FreezeStop
         global FreezeInterval
         global threadpool
+        print("Item clicked")
         if (column == 0):
             if (row.checkState(0) == Qt.Checked):
                 value = row.text(VALUE_COL)
@@ -1126,14 +1133,16 @@ class MainForm(QMainWindow, MainWindow):
                 if(len(FreezeVars) == 0):
                     FreezeStop = 0
                     FreezeThread = Worker(self.freeze)
+                    print("Freeze thread starting... await confirmation")
                     threadpool.start(FreezeThread)
                 FreezeVars[row.text(ADDR_COL)] = [value_index, value]
             else:
+                print("value removed, deleting from freeze pool")
                 del FreezeVars[row.text(ADDR_COL)]
                 if(len(FreezeVars) == 0):
+                    print("no other values in pool, sending exit to freeze thread")
                     FreezeStop = 1
 
-        
         
 
 
