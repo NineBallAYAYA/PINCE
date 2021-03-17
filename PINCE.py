@@ -229,7 +229,8 @@ class Worker(QRunnable):
         self.fn = fn
         self.args = args
         self.kwargs = kwargs
-  
+
+    @pyqtSlot()
     def run(self):
         self.fn(*self.args, **self.kwargs)
 
