@@ -220,7 +220,9 @@ FreezeVars = {}
 FreezeStop = 0
 ProgressRun = 0
 threadpool = QThreadPool()
-
+print("Max number of supported threads: %d" % threadpool.maxThreadCount())
+threadpool.setMaxThreadCount(10)
+print("Max number of supported threads: %d" % threadpool.maxThreadCount())
 
 class Worker(QRunnable):
     def __init__(self, fn, *args, **kwargs):
